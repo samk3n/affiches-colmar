@@ -1,6 +1,6 @@
 "use client";
 
-import { useScroll, useTransform, useMotionValue } from "framer-motion";
+import { useScroll, useTransform, useMotionValue, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 interface ScrollSequenceProps {
@@ -141,13 +141,30 @@ export default function ScrollSequence({ frameCount, getFramePath }: ScrollSeque
         return () => window.removeEventListener("resize", handleResize);
     }, [scrollIndex, images]); // Depend on images so we can render if they are loaded
 
+    // Text Animations
+    // 1. Initial State: "COLMAR" Title + Arrow
+    // Opacity goes from 1 to 0 very quickly
+    const initialTextOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+    const initialTextY = useTransform(scrollYProgress, [0, 0.08], [0, -20]);
+
+    // 2. Subtitle: "L'âme de l'Alsace."
+    // Appears after initial text
+    const subtitleOpacity = useTransform(scrollYProgress, [0.15, 0.25, 0.45, 0.55], [0, 1, 1, 0]);
+    const subtitleY = useTransform(scrollYProgress, [0.15, 0.25], [30, 0]);
+
+    // 3. Paragraph: "Plus qu'une affiche..."
+    // Appears after subtitle
+    const paragraphOpacity = useTransform(scrollYProgress, [0.4, 0.5, 0.8, 0.9], [0, 1, 1, 0]);
+    const paragraphY = useTransform(scrollYProgress, [0.4, 0.5], [30, 0]);
+
+
     return (
         <div ref={containerRef} className="h-[500vh] relative bg-timber">
             <div className="sticky top-0 h-screen w-full overflow-hidden">
                 {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-cream z-50">
                         <div className="text-center">
-                            <p className="font-serif text-2xl mb-2 text-timber">Chargement de l'expérience</p>
+                            <p className="font-serif text-2xl mb-2 text-timber">Bienvenue à Colmar</p>
                             <div className="w-64 h-1 bg-timber/20 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-brick transition-all duration-300 ease-out"
@@ -163,7 +180,58 @@ export default function ScrollSequence({ frameCount, getFramePath }: ScrollSeque
                     className="w-full h-full block object-cover"
                 />
 
-                {/* Optional Text Overlays based on scroll progress can go here or in parent */}
+                {/* Overlays */}
+                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-center z-10 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-6">
+
+                    {/* Initial Title & Arrow */}
+                    <motion.div
+                        style={{ opacity: initialTextOpacity, y: initialTextY }}
+                        className="absolute top-[15vh] flex flex-col items-center gap-8"
+                    >
+                        <h1 className="font-sans font-bold text-[15vw] md:text-[12rem] leading-none tracking-tighter uppercase">
+                            Colmar
+                        </h1>
+                        <motion.div
+                            animate={{ y: [0, 10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            <svg
+                                width="48"
+                                height="48"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M12 5v14" />
+                                <path d="M19 12l-7 7-7-7" />
+                            </svg>
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Subtitle */}
+                    <motion.div
+                        style={{ opacity: subtitleOpacity, y: subtitleY }}
+                        className="max-w-5xl px-4"
+                    >
+                        <h2 className="font-serif font-bold text-4xl md:text-6xl lg:text-8xl leading-tight">
+                            L'âme de l'Alsace.
+                        </h2>
+                    </motion.div>
+
+                    {/* Paragraph */}
+                    <motion.div
+                        style={{ opacity: paragraphOpacity, y: paragraphY }}
+                        className="absolute bottom-[20vh] max-w-3xl text-xl md:text-3xl font-serif leading-relaxed text-cream/90"
+                    >
+                        <p className="font-bold">
+                            Plus qu'une affiche, un fragment d'histoire à chérir chez soi.
+                        </p>
+                    </motion.div>
+
+                </div>
             </div>
         </div>
     );

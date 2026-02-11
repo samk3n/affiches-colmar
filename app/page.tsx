@@ -52,9 +52,9 @@ export default function Home() {
       </header>
 
       {/* Hero Section - Scrollytelling */}
-      {/* Frame count is 75 based on new assets */}
+      {/* Frame count is 76 based on new assets */}
       <div className="relative">
-        <ScrollSequence frameCount={75} getFramePath={getFramePath} />
+        <ScrollSequence frameCount={76} getFramePath={getFramePath} />
       </div>
 
       {/* Content Sections */}
